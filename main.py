@@ -1,7 +1,8 @@
 import pygame
-from pymongo import MAX_SUPPORTED_WIRE_VERSION
-from pyparsing import RecursiveGrammarException
+
 pygame.init()
+
+# Don't forget; adding or subbing is movement as well
 
 WIDTH , HEIGHT = 700 ,500 #All capital variable is constant!!!
 MY_WIN = pygame.display.set_mode((WIDTH,HEIGHT))
@@ -18,12 +19,13 @@ BALL_RADIUS = 7
 SCORE_FONT = pygame.font.SysFont('comicsans', 50)
 
 WINNING_SCORE = 10
+
 class Paddle:
     COLOR = WHITE
     VELOCITY = 4
     
     def __init__(self, x, y, width, height):
-        self.x = self.original_x = x # to reset position after scroing
+        self.x = self.original_x = x # to reset position after scoring
         self.y = self.original_y = y
         self.width = width
         self.height = height
@@ -81,7 +83,7 @@ def draw(win, paddles, ball, left_score, right_score):
         if i % 2 == 1:
             continue # pass odd numbers so we get dashed line
         pygame.draw.rect(MY_WIN, WHITE, (WIDTH//2 - 5, i, 10, HEIGHT//20))
-        # x = WIDTH//2 - rectange's width/2
+        # x = WIDTH//2 - rectangle's width/2
         # y = i 
         # rectangle's width = 10
         # rectangle's height HEIGHT//20 
@@ -98,7 +100,7 @@ def handle_collision(ball, left_paddle, right_paddle):
         ball.y_vel *= -1
     
     if ball.x_vel < 0: # direction of the ball
-        if ball.y >= left_paddle.y and ball.y <= left_paddle.y + left_paddle.height: # in hiehgt of paddle
+        if ball.y >= left_paddle.y and ball.y <= left_paddle.y + left_paddle.height: # in heigt of paddle
             if ball.x - ball.radius <= left_paddle.x + left_paddle.width: # if touching the surcafe of paddle
                 ball.x_vel *= -1 # reversed the speed so it goes the other way
                 
@@ -128,14 +130,14 @@ def handle_paddle_movement(keys, left_paddle, right_paddle):
         right_paddle.move_pad(up=True)
     if keys[pygame.K_DOWN] and (right_paddle.y + right_paddle.height) - right_paddle.VELOCITY <= HEIGHT:
         right_paddle.move_pad(up=False)
-    # after and we restrict the movement of paddles into the window
+    # after 'and' we restrict the movement of paddles so they stay on screen
     
 def main():
     run = True
-    clock = pygame.time.Clock() #to run game with same fps on every comp. top-fps limit
+    clock = pygame.time.Clock() #to run the game with same fps on every comp ;top-fps limit
     
     left_paddle = Paddle(
-        10, HEIGHT//2 - PADDLE_HEIGHT//2, PADDLE_WIDTH, PADDLE_HEIGHT) # doing // to get an int
+        10, HEIGHT//2 - PADDLE_HEIGHT//2, PADDLE_WIDTH, PADDLE_HEIGHT) # doing '//' to avoid floats
     right_paddle = Paddle(
         WIDTH - 10 - PADDLE_WIDTH, HEIGHT//2 - PADDLE_HEIGHT//2, PADDLE_WIDTH, PADDLE_HEIGHT) 
     ball = Ball(
@@ -146,7 +148,7 @@ def main():
     
     while run:
         clock.tick(FPS)
-        draw(MY_WIN, [left_paddle, right_paddle], ball, left_score, right_score) # paddles in list os we used for loop in draw(win)
+        draw(MY_WIN, [left_paddle, right_paddle], ball, left_score, right_score) # paddles in list so we used for loop in draw(win)
         
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -170,7 +172,7 @@ def main():
             left_paddle.reset_paddle()
             right_paddle.reset_paddle()
         
-        won = False # tidy win conditions and messages
+        won = False # to tidy up again
         if left_score >= 10:
             won = True
             win_text = 'Left Player Won!'
