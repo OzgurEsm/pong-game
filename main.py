@@ -158,8 +158,8 @@ def main():
         ball.move_ball()    
         handle_collision(ball, left_paddle, right_paddle)
         
-        score_up = False
-        if ball.x < 0 : # left side of win
+        score_up = False # trying to tidy up resets
+        if ball.x < 0 : 
             right_score += 1
             score_up = True
         elif ball.x > WIDTH:
@@ -170,13 +170,13 @@ def main():
             left_paddle.reset_paddle()
             right_paddle.reset_paddle()
         
-        won = False
+        won = False # tidy win conditions and messages
         if left_score >= 10:
             won = True
             win_text = 'Left Player Won!'
         elif right_score >= 10:
             won = True
-            win_text = 'Left Player Won!'
+            win_text = 'Right Player Won!'
         if won:
             won_text = SCORE_FONT.render(win_text, True, WHITE)
             MY_WIN.blit(won_text, (WIDTH//2 - won_text.get_width() //2, HEIGHT//2 - won_text.get_height() //2))
