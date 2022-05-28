@@ -30,11 +30,11 @@ class Paddle:
         self.width = width
         self.height = height
         
-    def draw_pad(self,win):
+    def draw_paddle(self,win):
         pygame.draw.rect(
             win, self.COLOR, (self.x, self.y, self.width, self.height))
         
-    def move_pad(self, up=True):
+    def move_paddle(self, up=True):
         if up:
             self.y -= self.VELOCITY
         else:
@@ -57,7 +57,7 @@ class Ball:
 
     def draw_ball(self,win):
         pygame.draw.circle(win, self.COLOR, (self.x, self.y), self.radius)
-    
+
     def move_ball(self):
         self.x += self.x_vel
         self.y += self.y_vel
@@ -77,7 +77,7 @@ def draw(win, paddles, ball, left_score, right_score):
     win.blit(right_score_text, (WIDTH * (3/4) - right_score_text.get_width()//2, 20))
     
     for paddle in paddles:
-        paddle.draw_pad(win)
+        paddle.draw_paddle(win)
     
     for i in range(10, HEIGHT, HEIGHT//20): 
         if i % 2 == 1:
@@ -96,7 +96,7 @@ def draw(win, paddles, ball, left_score, right_score):
 def handle_collision(ball, left_paddle, right_paddle):
     if ball.y + ball.radius >= HEIGHT: # hitting bottom
         ball.y_vel *= -1 
-    elif ball.y - ball.radius <= 0: #hitting ceiling
+    elif ball.y - ball.radius <= 0: # hitting ceiling
         ball.y_vel *= -1
     
     if ball.x_vel < 0: # direction of the ball
@@ -106,7 +106,7 @@ def handle_collision(ball, left_paddle, right_paddle):
                 
                 paddle_middle_y = left_paddle.y + PADDLE_HEIGHT / 2 
                 difference_in_y = ball.y - paddle_middle_y
-                reduction_factor = (PADDLE_HEIGHT/2) / ball.MAX_VEL # further away from mid point the faster ball gets by this factor
+                reduction_factor = (PADDLE_HEIGHT/2) / ball.MAX_VEL # colliding further away from mid point of the paddle the faster the ball gets by this factor
                 y_vel = difference_in_y / reduction_factor
                 ball.y_vel = y_vel
 
@@ -121,20 +121,29 @@ def handle_collision(ball, left_paddle, right_paddle):
                 y_vel = difference_in_y / reduction_factor
                 ball.y_vel = y_vel
         
-def handle_paddle_movement(keys, left_paddle, right_paddle):
+def handle_paddle_movement(keys, left_paddle, right_paddle, ball): # added ball for Ai conditions
     if keys[pygame.K_w] and left_paddle.y - left_paddle.VELOCITY >= 0:
-        left_paddle.move_pad(up=True)
+        left_paddle.move_paddle(up=True)
     if keys[pygame.K_s] and (left_paddle.y + left_paddle.height) - left_paddle.VELOCITY <= HEIGHT:
-        left_paddle.move_pad(up=False)
-    if keys[pygame.K_UP] and right_paddle.y - right_paddle.VELOCITY >= 0:
-        right_paddle.move_pad(up=True)
-    if keys[pygame.K_DOWN] and (right_paddle.y + right_paddle.height) - right_paddle.VELOCITY <= HEIGHT:
-        right_paddle.move_pad(up=False)
-    # after 'and' we restrict the movement of paddles so they stay on screen
+        left_paddle.move_paddle(up=False)
+        
+    # disabled for Ai    
+    #if keys[pygame.K_UP] and right_paddle.y - right_paddle.VELOCITY >= 0: 
+        #right_paddle.move_paddle(up=True)
+    #if keys[pygame.K_DOWN] and (right_paddle.y + right_paddle.height) - right_paddle.VELOCITY <= HEIGHT:
+        #right_paddle.move_paddle(up=False)
+        # after 'and' we restrict the movement of paddles so they stay on screen
+        
+    if ball.x_vel > 0: # Ai paddle movement conditions , ball moving towards right_paddle
+        if ball.y < right_paddle.y + right_paddle.height  and right_paddle.y - right_paddle.VELOCITY >= 0:
+            right_paddle.move_paddle(up=True)
+        elif ball.y > right_paddle.y and (right_paddle.y + right_paddle.height) - right_paddle.VELOCITY <= HEIGHT:
+            right_paddle.move_paddle(up=False)
+    # added Ai instead of a 2. player, already better than me.Need to add difficulty levels,after the cl final tho!
     
 def main():
     run = True
-    clock = pygame.time.Clock() #to run the game with same fps on every comp ;top-fps limit
+    clock = pygame.time.Clock() # to run the game with same fps on every comp ;top-fps limit
     
     left_paddle = Paddle(
         10, HEIGHT//2 - PADDLE_HEIGHT//2, PADDLE_WIDTH, PADDLE_HEIGHT) # doing '//' to avoid floats
@@ -155,8 +164,8 @@ def main():
                 run  = False
                 break
         
-        keys = pygame.key.get_pressed() #gives us a list so we dont have to make one   
-        handle_paddle_movement(keys, left_paddle, right_paddle)
+        keys = pygame.key.get_pressed() # gives us a list so we dont have to make one   
+        handle_paddle_movement(keys, left_paddle, right_paddle, ball) # added ball for Ai conditions
         ball.move_ball()    
         handle_collision(ball, left_paddle, right_paddle)
         
