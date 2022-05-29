@@ -20,6 +20,13 @@ SCORE_FONT = pygame.font.SysFont('comicsans', 50)
 
 WINNING_SCORE = 10
 
+sound_ball = pygame.mixer.Sound('racquet.wav')
+sound_ball2 = pygame.mixer.Sound('rubber-ball.wav')
+sound_cheer = pygame.mixer.Sound('crowd.wav')
+sound_clap = pygame.mixer.Sound('moreclaps.wav')
+sound_ball.set_volume(0.5)
+sound_ball2.set_volume(0.5)
+
 class Paddle:
     COLOR = WHITE
     VELOCITY = 4
@@ -103,6 +110,7 @@ def handle_collision(ball, left_paddle, right_paddle):
         if ball.y >= left_paddle.y and ball.y <= left_paddle.y + left_paddle.height: # in heigt of paddle
             if ball.x - ball.radius <= left_paddle.x + left_paddle.width: # if touching the surcafe of paddle
                 ball.x_vel *= -1 # reversed the speed so it goes the other way
+                sound_ball.play()
                 
                 paddle_middle_y = left_paddle.y + PADDLE_HEIGHT / 2 
                 difference_in_y = ball.y - paddle_middle_y
@@ -113,7 +121,8 @@ def handle_collision(ball, left_paddle, right_paddle):
     else:
         if ball.y >= right_paddle.y and ball.y <= right_paddle.y + right_paddle.height:
             if ball.x + ball.radius >= right_paddle.x:
-                ball.x_vel *= -1                    
+                ball.x_vel *= -1
+                sound_ball2.play()                  
 
                 paddle_middle_y = right_paddle.y + PADDLE_HEIGHT / 2
                 difference_in_y = ball.y - paddle_middle_y 
@@ -136,9 +145,9 @@ def handle_paddle_movement(keys, left_paddle, right_paddle, ball): # added ball 
     
     # added Ai instead of a 2. player, already better than me.Need to add difficulty levels,after the cl final tho!            
     if ball.x_vel > 0 and ball.x > WIDTH//2: # Ai paddle movement conditions , ball moving towards right_paddle
-        if ball.y - ball.radius < right_paddle.y  and right_paddle.y - right_paddle.VELOCITY >= 0:
+        if ball.y - ball.radius < right_paddle.y : #and right_paddle.y - right_paddle.VELOCITY >= 0
             right_paddle.move_paddle(up=True)
-        elif ball.y + ball.radius > right_paddle.y and (right_paddle.y + right_paddle.height) - right_paddle.VELOCITY <= HEIGHT:
+        elif ball.y + ball.radius > right_paddle.y+ right_paddle.height: #and (right_paddle.y + right_paddle.height) - right_paddle.VELOCITY <= HEIGHT
             right_paddle.move_paddle(up=False)
     if ball.x_vel < 0: # paddle moves to starting pos. after hitting the ball
         if right_paddle.y > right_paddle.original_y:
@@ -182,6 +191,7 @@ def play():
             left_score += 1
             score_up = True
         if score_up:
+            sound_clap.play()
             ball.reset_ball()
             left_paddle.reset_paddle()
             right_paddle.reset_paddle()
@@ -194,6 +204,7 @@ def play():
             won = True
             win_text = 'Right Player Won!'
         if won:
+            sound_cheer.play()
             won_text = SCORE_FONT.render(win_text, True, WHITE)
             MY_WIN.blit(won_text, (WIDTH//2 - won_text.get_width() //2, HEIGHT//2 - won_text.get_height() //2))
             pygame.display.update()
@@ -210,7 +221,7 @@ def main():
     
     while True:
         MY_WIN.fill(BLACK)
-        menu_text = SCORE_FONT.render('WELCOME to PONG', True, WHITE)
+        menu_text = SCORE_FONT.render('WELCOME', True, WHITE)
         menu_rect = menu_text.get_rect(center=(WIDTH//2, HEIGHT*0.2))
         MY_WIN.blit(menu_text, menu_rect)
         
