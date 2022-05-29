@@ -133,15 +133,20 @@ def handle_paddle_movement(keys, left_paddle, right_paddle, ball): # added ball 
     #if keys[pygame.K_DOWN] and (right_paddle.y + right_paddle.height) - right_paddle.VELOCITY <= HEIGHT:
         #right_paddle.move_paddle(up=False)
         # after 'and' we restrict the movement of paddles so they stay on screen
-        
-    if ball.x_vel > 0: # Ai paddle movement conditions , ball moving towards right_paddle
-        if ball.y < right_paddle.y + right_paddle.height  and right_paddle.y - right_paddle.VELOCITY >= 0:
-            right_paddle.move_paddle(up=True)
-        elif ball.y > right_paddle.y and (right_paddle.y + right_paddle.height) - right_paddle.VELOCITY <= HEIGHT:
-            right_paddle.move_paddle(up=False)
-    # added Ai instead of a 2. player, already better than me.Need to add difficulty levels,after the cl final tho!
     
-def main():
+    # added Ai instead of a 2. player, already better than me.Need to add difficulty levels,after the cl final tho!            
+    if ball.x_vel > 0 and ball.x > WIDTH//2: # Ai paddle movement conditions , ball moving towards right_paddle
+        if ball.y - ball.radius < right_paddle.y  and right_paddle.y - right_paddle.VELOCITY >= 0:
+            right_paddle.move_paddle(up=True)
+        elif ball.y + ball.radius > right_paddle.y and (right_paddle.y + right_paddle.height) - right_paddle.VELOCITY <= HEIGHT:
+            right_paddle.move_paddle(up=False)
+    if ball.x_vel < 0: # paddle moves to starting pos. after hitting the ball
+        if right_paddle.y > right_paddle.original_y:
+            right_paddle.move_paddle(up=True)
+        if right_paddle.y < right_paddle.original_y:
+            right_paddle.move_paddle(up=False)
+    
+def play():
     run = True
     clock = pygame.time.Clock() # to run the game with same fps on every comp ;top-fps limit
     
@@ -198,8 +203,46 @@ def main():
             left_paddle.reset_paddle()     
             left_score = 0
             right_score = 0
-    pygame.quit()
+    return main()
     
+def main():
+    pygame.display.set_caption('Menu')
+    
+    while True:
+        MY_WIN.fill(BLACK)
+        menu_text = SCORE_FONT.render('WELCOME to PONG', True, WHITE)
+        menu_rect = menu_text.get_rect(center=(WIDTH//2, HEIGHT*0.2))
+        MY_WIN.blit(menu_text, menu_rect)
+        
+        # want to implement both PvP and PvE,have to split the 1 single file system i guess
+        
+        #single_font = pygame.font.Font(None, 30)
+        #single_text = single_font.render('For Single Player: Press 1', True, WHITE)
+        #single_rect = single_text.get_rect(center=(WIDTH//2, HEIGHT*0.4))
+        #MY_WIN.blit(single_text, single_rect)
+        #
+        #multi_font = pygame.font.Font(None, 30)
+        #multi_text = multi_font.render('For Multiplayer: Press 2', True, WHITE)
+        #multi_rect = multi_text.get_rect(center=(WIDTH//2,HEIGHT*0.45))
+        #MY_WIN.blit(multi_text, multi_rect)
+        
+        guide_font = pygame.font.Font(None, 30)
+        guide_text1 = guide_font.render('Player 1: Use "w" and "s" to move', True, WHITE)
+        guide_text2 = guide_font.render('Player 2: Use arrow keys to move', True, WHITE)
+        guide_text1_rect = guide_text1.get_rect(center=(WIDTH//4, HEIGHT*0.6))
+        guide_text2_rect = guide_text2.get_rect(center=(WIDTH*(3/4), HEIGHT*0.6))
+        MY_WIN.blit(guide_text1, guide_text1_rect)
+        MY_WIN.blit(guide_text2, guide_text2_rect)
+        
+        pygame.display.update()
+        
+        for event in pygame.event.get():
+            keys = pygame.key.get_pressed()
+            if event.type == pygame.QUIT:
+                quit()
+            if keys[pygame.K_RETURN]:
+                play()
+                
 
 if __name__ == '__main__':
     main()
