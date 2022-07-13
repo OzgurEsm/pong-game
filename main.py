@@ -29,7 +29,7 @@ sound_ball2.set_volume(0.5)
 
 class Paddle:
     COLOR = WHITE
-    VELOCITY = 4
+    VELOCITY = 4.5
     
     def __init__(self, x, y, width, height):
         self.x = self.original_x = x # to reset position after scoring
